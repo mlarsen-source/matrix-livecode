@@ -18,7 +18,11 @@ public class SalamanderSearch {
             {'f','W','.','.','W','.'},
             {'W','.','W','.','.','.'},
         };
+        
+        canReach(enclosure1);
     }
+
+
 
     /**
      * Returns whether a salamander can reach the food in an enclosure.
@@ -44,6 +48,77 @@ public class SalamanderSearch {
      * @throws IllegalArgumentException if the enclosure does not contain a salamander
      */
     public static boolean canReach(char[][] enclosure) {
+        int[] start = salamanderLocation(enclosure);
+        boolean[][] visited = new boolean[enclosure.length][enclosure[0].length];
+        return (canReach(enclosure, start, visited));
+    }
+
+     public static boolean canReach(char[][] enclosure, int[]current, boolean[][] visited) {
+        
+        PrettyPrint.prettyPrintln(current);
+        PrettyPrint.prettyPrintln(visited);
+        int curR = current[0];
+        int curC = current[1];
+        
+        if(enclosure[curR][curC] == 'f') return true;
+        if(visited[curR][curC]) return false;
+        visited[curR][curC] = true;
+
+        List<int[]> neighbors = possibleMoves(enclosure, current);
+        for(int[] neighbor : neighbors) { 
+            if(canReach(enclosure, neighbor, visited)) return true;
+        }
         return false;
+    }
+
+
+    // O(n * m) n = # of rows, m = # of columns
+    public static int[] salamanderLocation(char[][] enclosure) {
+        for(int r = 0;  r < enclosure.length; r++) {
+            for(int c = 0 ; c < enclosure[r].length; c++) {
+                if(enclosure[r][c] == 's') {
+                    int[]location = new int[] {r, c};
+                    return location;
+                }
+            }
+        }
+        throw new IllegalArgumentException("No salamander present");
+    }
+
+
+    public static List<int[]> possibleMoves(char[][] enclosure, int[] current) {
+        List<int[]> moves = new ArrayList<>();
+        int curR = current[0];
+        int curC = current[1];
+
+        // up
+       int newR = curR -1;
+       int newC = curC;
+       if(newR >= 0 && enclosure[newR][newC] !='W') {
+        moves.add(new int[]{newR, newC});
+       }
+
+       // down
+        newR = curR +1;
+        newC = curC;
+        if(newR < enclosure.length && enclosure[newR][newC] !='W') {
+            moves.add(new int[]{newR, newC});
+       }
+
+       // left
+        newR = curR;
+        newC = curC -1;
+        if(newC >=0 && enclosure[newR][newC] !='W') {
+            moves.add(new int[]{newR, newC});
+       }
+
+        // right
+        newR = curR;
+        newC = curC +1;
+        if(newC < enclosure[newR].length && enclosure[newR][newC] !='W') {
+            moves.add(new int[]{newR, newC});
+       }
+
+       return moves;
     }
 }
